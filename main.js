@@ -24,3 +24,45 @@ let chartData = {
 //activity data store
 let activityHistory = [];
 let isDataLoaded = false;
+
+//initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    setupFirebaseListners();
+});
+
+function setupFirebaseListners(){
+    //listen for real-time updates
+    database.ref('roomCounter').on('value', (snapshot) => {
+        const date = snapshot.val();
+        if(data){
+            isDataLoaded = true;
+        }
+    }, (error) => {
+        console.error('Firebase Error: ', error);
+    });
+
+    //Listen for Activity log
+    database.ref('roomCounter/logs').limitToLast(10).on('value', (snapshot) => {
+        const logs = snapshot.val();
+        if(logs){
+            
+        }
+    })
+
+    //handle connection state
+    database.ref('.info/connected').on('value', (snapshot) => {
+        const connected = snapshot.val();
+        updateConnectionStatus(connected);
+    })
+}
+
+function updateConnectionStatus(connected){
+    const statusElement = document.getElementById('connectionStatus');
+    if(connected){
+        statusElement.className = 'connection-status connected';
+        statusElement.innerHTML = '<i class="fas fa-wifi"></i> Connected';
+    } else {
+        statusElement.className = 'connection-status disconnected';
+        statusElement.innerHTML = '<i class="fas fa-wifi"></i> Disconnected';
+    }
+}
